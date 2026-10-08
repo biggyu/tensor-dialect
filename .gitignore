@@ -1,3 +1,6 @@
+mlir/
+.vscode/
+
 # Prerequisites
 *.d
 

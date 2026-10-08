@@ -1,0 +1,72 @@
+
+def Tensor_Dialect : Dialect {
+    let name = "tensor_ops";
+
+    // let sumamry = "A dialect for tensor matmul, add, and relu";
+
+    // let description = [{}]
+
+    let cppNamespace = "tensor_ops";
+}
+
+class Tensor_Op<string mnemonic, list<Trait> traits = [] > :
+    Op<Tensor_Dialect, mnemonic, traits>;
+
+def ConstantOp : Tensor_Op<"constant"> {
+    let arguments = (ins F64ElementsAttr:$value);
+
+    let results = (outs F64Tensor:$result);
+
+    let hasVerifier = 1;
+
+    let builder = [
+        // different type of builder that has different ins
+        OpBuilder<(ins "DenseElementsAttr":$value), [{
+            build(builder, result, value.getType(), value);
+        }]>,
+        OpBuilder<(ins "double":$value)>
+    ];
+}
+def MatMulOp : Tensor_Op<"matmul"> {
+    // let summary = "";
+    // let description = [{}];
+    // let arguments = (ins F64Tensor, F64Tensor); -> wrong
+    let arguments = (ins F64Tensor:$lhs, F64Tensor:$rhs);
+
+    let results = (outs F64Tensor:$result);
+
+    let hasVerifier = 1;
+
+    // let builder = [
+    //     OpBuilder<(ins ), [{
+    //     }]>,
+    //     OpBuilder<(ins )
+    // ];
+}
+def AddOp : Tensor_Op<"add"> {
+    // let summary = "";
+    // let description = [{}];
+    // let arguments = (ins F64Tensor, F64Tensor);
+    let arguments = (ins F64Tensor:$lhs, F64Tensor:$rhs);
+
+    let results = (outs F64Tensor:$result);
+
+    let hasVerifier = 1;
+}
+def ReluOp : Tensor_Op<"relu"> {
+    // let summary = "";
+    // let description = [{}];
+    // let arguments = (ins F64Tensor);
+    let arguments = (ins F64Tensor:$input);
+
+    let results = (outs F64Tensor:$output);
+
+    let hasVerifier = 1;
+    let hasCanonicalizer = 1;
+}
+
+def PrintOp : Tensor_Op<"print"> {
+    let arguments = (ins F64ElementsAttr:$input);
+
+    let assemblyFormat = "$input attr-dict ':' type($input)";
+}
