@@ -1,0 +1,5 @@
+add_mlir_dialect(TensorOps tensor_ops)
+add_mlir_doc(TensorOps TensorOps Dialects/ -gen-dialect-doc)
+set(LLVM_TARGET_DEFINITIONS TensorOpsPatterns.td)
+mlir_tablegen(TensorOpsPatterns.h.inc -gen-rewriters)
+add_public_tablegen_target(MLIRTensorOpsPatternsIncGen)

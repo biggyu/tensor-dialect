@@ -1,3 +1,5 @@
+include "mlir/IR/OpBase.td"
+include "mlir/Interfaces/SideEffectInterfaces.td"
 
 def Tensor_Dialect : Dialect {
     let name = "tensor_ops";
@@ -19,11 +21,12 @@ def ConstantOp : Tensor_Op<"constant"> {
 
     let hasVerifier = 1;
 
-    let builder = [
+    let builders = [
         // different type of builder that has different ins
-        OpBuilder<(ins "DenseElementsAttr":$value), [{
-            build(builder, result, value.getType(), value);
+        OpBuilder<(ins "::mlir::DenseElementsAttr":$value), [{
+            build($_builder, $_state, value.getType(), value);
         }]>,
+
         OpBuilder<(ins "double":$value)>
     ];
 }
@@ -36,12 +39,7 @@ def MatMulOp : Tensor_Op<"matmul"> {
     let results = (outs F64Tensor:$result);
 
     let hasVerifier = 1;
-
-    // let builder = [
-    //     OpBuilder<(ins ), [{
-    //     }]>,
-    //     OpBuilder<(ins )
-    // ];
+    let assemblyFormat = "$lhs `,` $rhs attr-dict `:` type($lhs) `,` type($rhs) `->` type($result)";
 }
 def AddOp : Tensor_Op<"add"> {
     // let summary = "";
@@ -52,21 +50,23 @@ def AddOp : Tensor_Op<"add"> {
     let results = (outs F64Tensor:$result);
 
     let hasVerifier = 1;
+    let assemblyFormat = "$lhs `,` $rhs attr-dict `:` type($lhs) `,` type($rhs) `->` type($result)";
 }
-def ReluOp : Tensor_Op<"relu"> {
+def ReluOp : Tensor_Op<"relu", [Pure]> {
     // let summary = "";
     // let description = [{}];
     // let arguments = (ins F64Tensor);
     let arguments = (ins F64Tensor:$input);
 
-    let results = (outs F64Tensor:$output);
+    let results = (outs F64Tensor:$result);
 
     let hasVerifier = 1;
     let hasCanonicalizer = 1;
+    //match with $result above
+    let assemblyFormat = "$input attr-dict `:` type($input) `->` type($result)";
 }
 
 def PrintOp : Tensor_Op<"print"> {
-    let arguments = (ins F64ElementsAttr:$input);
-
-    let assemblyFormat = "$input attr-dict ':' type($input)";
+    let arguments = (ins F64Tensor:$input);
+    let assemblyFormat = "$input attr-dict `:` type($input)";
 }
