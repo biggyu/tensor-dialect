@@ -1,5 +1,6 @@
 mlir/
 .vscode/
+build/
 
 # Prerequisites
 *.d
