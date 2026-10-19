@@ -18,7 +18,8 @@ def ConstantOp : Tensor_Op<"constant"> {
     let arguments = (ins F64ElementsAttr:$value);
 
     let results = (outs F64Tensor:$result);
-
+    let assemblyFormat = "attr-dict `:` type($result)";
+    // let hasCustomAssemblyFormat = 0;
     let hasVerifier = 1;
 
     let builders = [
